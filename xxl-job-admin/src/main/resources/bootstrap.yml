@@ -1,0 +1,87 @@
+#兴业专用的xxl-job栩置，不走nacos，使用本地配置
+management:
+  health:
+    mail:
+      enabled: false
+  server:
+    servlet:
+      context-path: /actuator
+mybatis:
+  mapper-locations: classpath:/mybatis-mapper/*Mapper.xml
+server:
+  port: ${SERVER_PORT:10090}
+  servlet:
+    context-path: /xxl-job-admin
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:chaos-xxl-job}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      auto-commit: true
+      connection-test-query: SELECT 1
+      connection-timeout: 10000
+      idle-timeout: 30000
+      max-lifetime: 900000
+      maximum-pool-size: 30
+      minimum-idle: 10
+      pool-name: HikariCP
+      validation-timeout: 1000
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${DB_URL}
+
+  freemarker:
+    charset: UTF-8
+    request-context-attribute: request
+    settings:
+      number_format: 0.##########
+    suffix: .ftl
+    templateLoaderPath: classpath:/templates/
+  mail:
+    from: ${MAIL_FROM:xxx@qq.com}
+    host: ${MAIL_HOST:smtp.qq.com}
+    username: ${MAIL_USERNAME:xxx@qq.com}
+    password: ${MAIL_PASSWORD:xxx}
+    port: ${MAIL_PORT:25}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+          starttls:
+            enable: true
+            required: true
+  mvc:
+    servlet:
+      load-on-startup: 0
+    static-path-pattern: /static/**
+  resources:
+    static-locations: classpath:/static/
+
+  redis:
+    database: ${REDIS_DATABASE:0}
+    password: ${REDIS_PASSWORD:}
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    lettuce:
+      pool:
+        max-active: 100
+        max-wait: -1
+        max-idle: 10
+        min-idle: 3
+    timeout: 10000
+xxl:
+  job:
+    accessToken: ${ACCESSTOKEN:cee8d3f4791411eca519005056b38058}
+    i18n: zh_CN
+    logretentiondays: ${LOGRETENTIONDAYS:7}
+    triggerpool:
+      fast:
+        max: ${TRIGGERPOOL_FAST_MAX:200}
+      slow:
+        max: ${TRIGGERPOOL_SLOW_MAX:100}
+    print:
+      schedule-lock-log: ${PRINT_SCHEDULE_LOCK_LOG:false}
