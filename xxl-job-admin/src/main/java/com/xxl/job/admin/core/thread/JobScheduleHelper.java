@@ -6,6 +6,9 @@ import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.scheduler.MisfireStrategyEnum;
 import com.xxl.job.admin.core.scheduler.ScheduleTypeEnum;
 import com.xxl.job.admin.core.trigger.TriggerTypeEnum;
+import com.xxl.job.admin.utils.ApplicationContextUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +30,8 @@ public class JobScheduleHelper {
         return instance;
     }
 
+    private static final String REDIS_LOCK_NAME = "JobScheduleLock";
+
     public static final long PRE_READ_MS = 5000;    // pre read
 
     private Thread scheduleThread;
@@ -41,7 +46,6 @@ public class JobScheduleHelper {
         scheduleThread = new Thread(new Runnable() {
             @Override
             public void run() {
-
                 try {
                     TimeUnit.MILLISECONDS.sleep(5000 - System.currentTimeMillis()%1000 );
                 } catch (InterruptedException e) {
@@ -59,20 +63,16 @@ public class JobScheduleHelper {
                     // Scan Job
                     long start = System.currentTimeMillis();
 
-                    Connection conn = null;
-                    Boolean connAutoCommit = null;
-                    PreparedStatement preparedStatement = null;
-
                     boolean preReadSuc = true;
+                    RedissonClient redissonClient;
+                    RLock redisLock = null;
                     try {
+                        redissonClient = XxlJobAdminConfig.getAdminConfig().getRedissonClient();
+                        redisLock = redissonClient.getLock(REDIS_LOCK_NAME);
 
-                        conn = XxlJobAdminConfig.getAdminConfig().getDataSource().getConnection();
-                        connAutoCommit = conn.getAutoCommit();
-                        conn.setAutoCommit(false);
-
-                        preparedStatement = conn.prepareStatement(  "select * from xxl_job_lock where lock_name = 'schedule_lock' for update" );
-                        preparedStatement.execute();
-
+                        logger.info(">>>>>>>>> 调度开始，等待redis锁,CurrentThreadId:{}", Thread.currentThread().getId());
+                        redisLock.lock();
+                        logger.info(">>>>>>>>> 调度处理中，成功获取锁,CurrentThreadId:{}",Thread.currentThread().getId());
                         // tx start
 
                         // 1、pre read
@@ -155,41 +155,9 @@ public class JobScheduleHelper {
                             logger.error(">>>>>>>>>>> xxl-job, JobScheduleHelper#scheduleThread error:{}", e);
                         }
                     } finally {
-
-                        // commit
-                        if (conn != null) {
-                            try {
-                                conn.commit();
-                            } catch (SQLException e) {
-                                if (!scheduleThreadToStop) {
-                                    logger.error(e.getMessage(), e);
-                                }
-                            }
-                            try {
-                                conn.setAutoCommit(connAutoCommit);
-                            } catch (SQLException e) {
-                                if (!scheduleThreadToStop) {
-                                    logger.error(e.getMessage(), e);
-                                }
-                            }
-                            try {
-                                conn.close();
-                            } catch (SQLException e) {
-                                if (!scheduleThreadToStop) {
-                                    logger.error(e.getMessage(), e);
-                                }
-                            }
-                        }
-
-                        // close PreparedStatement
-                        if (null != preparedStatement) {
-                            try {
-                                preparedStatement.close();
-                            } catch (SQLException e) {
-                                if (!scheduleThreadToStop) {
-                                    logger.error(e.getMessage(), e);
-                                }
-                            }
+                        if(redisLock != null){
+                            redisLock.unlock();
+                            logger.info(">>>>>>>>> 调度结束，释放锁,耗时：{}ms,CurrentThreadId:{}", System.currentTimeMillis() - start, Thread.currentThread().getId());
                         }
                     }
                     long cost = System.currentTimeMillis()-start;

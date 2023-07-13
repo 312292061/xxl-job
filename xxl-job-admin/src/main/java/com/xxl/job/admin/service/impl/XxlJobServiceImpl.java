@@ -301,6 +301,20 @@ public class XxlJobServiceImpl implements XxlJobService {
 	}
 
 	@Override
+	public ReturnT<String> batchRemove(List<Integer> ids) {
+		for (int id : ids) {
+			XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(id);
+			if (xxlJobInfo == null) {
+				continue;
+			}
+			xxlJobInfoDao.delete(id);
+			xxlJobLogDao.delete(id);
+			xxlJobLogGlueDao.deleteByJobId(id);
+		}
+		return ReturnT.SUCCESS;
+	}
+
+	@Override
 	public ReturnT<String> start(int id) {
 		XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(id);
 
@@ -431,4 +445,8 @@ public class XxlJobServiceImpl implements XxlJobService {
 		return new ReturnT<Map<String, Object>>(result);
 	}
 
+	@Override
+	public XxlJobInfo getById(Integer id) {
+		return xxlJobInfoDao.loadById(id);
+	}
 }

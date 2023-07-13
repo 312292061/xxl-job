@@ -3,6 +3,7 @@ package com.xxl.job.admin.core.conf;
 import com.xxl.job.admin.core.alarm.JobAlarmer;
 import com.xxl.job.admin.core.scheduler.XxlJobScheduler;
 import com.xxl.job.admin.dao.*;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,6 +87,8 @@ public class XxlJobAdminConfig implements InitializingBean, DisposableBean {
     @Resource
     private JobAlarmer jobAlarmer;
 
+    @Resource
+    private RedissonClient redissonClient;
 
     public String getI18n() {
         if (!Arrays.asList("zh_CN", "zh_TC", "en").contains(i18n)) {
@@ -155,4 +158,7 @@ public class XxlJobAdminConfig implements InitializingBean, DisposableBean {
         return jobAlarmer;
     }
 
+    public RedissonClient getRedissonClient() {
+        return redissonClient;
+    }
 }

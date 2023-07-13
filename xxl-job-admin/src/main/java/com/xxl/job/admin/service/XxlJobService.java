@@ -5,6 +5,7 @@ import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.core.biz.model.ReturnT;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +53,14 @@ public interface XxlJobService {
 	public ReturnT<String> remove(int id);
 
 	/**
+	 * batch remove job
+	 * 	 *
+	 * @param ids
+	 * @return
+	 */
+	public ReturnT<String> batchRemove(List<Integer> ids);
+
+	/**
 	 * start job
 	 *
 	 * @param id
@@ -83,4 +92,11 @@ public interface XxlJobService {
 	 */
 	public ReturnT<Map<String,Object>> chartInfo(Date startDate, Date endDate);
 
+	/**
+	 * getById
+	 *
+	 * @param id
+	 * @return
+	 */
+	XxlJobInfo getById(Integer id);
 }

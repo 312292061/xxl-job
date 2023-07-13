@@ -116,12 +116,12 @@ public class XxlJobTrigger {
         String shardingParam = (ExecutorRouteStrategyEnum.SHARDING_BROADCAST==executorRouteStrategyEnum)?String.valueOf(index).concat("/").concat(String.valueOf(total)):null;
 
         // 1、save log-id
-        XxlJobLog jobLog = new XxlJobLog();
-        jobLog.setJobGroup(jobInfo.getJobGroup());
-        jobLog.setJobId(jobInfo.getId());
-        jobLog.setTriggerTime(new Date());
-        XxlJobAdminConfig.getAdminConfig().getXxlJobLogDao().save(jobLog);
-        logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
+//        XxlJobLog jobLog = new XxlJobLog();
+//        jobLog.setJobGroup(jobInfo.getJobGroup());
+//        jobLog.setJobId(jobInfo.getId());
+//        jobLog.setTriggerTime(new Date());
+//        XxlJobAdminConfig.getAdminConfig().getXxlJobLogDao().save(jobLog);
+        logger.debug(">>>>>>>>>>> xxl-job trigger start, no syslog");
 
         // 2、init trigger-param
         TriggerParam triggerParam = new TriggerParam();
@@ -130,8 +130,8 @@ public class XxlJobTrigger {
         triggerParam.setExecutorParams(jobInfo.getExecutorParam());
         triggerParam.setExecutorBlockStrategy(jobInfo.getExecutorBlockStrategy());
         triggerParam.setExecutorTimeout(jobInfo.getExecutorTimeout());
-        triggerParam.setLogId(jobLog.getId());
-        triggerParam.setLogDateTime(jobLog.getTriggerTime().getTime());
+//        triggerParam.setLogId(jobLog.getId());
+//        triggerParam.setLogDateTime(jobLog.getTriggerTime().getTime());
         triggerParam.setGlueType(jobInfo.getGlueType());
         triggerParam.setGlueSource(jobInfo.getGlueSource());
         triggerParam.setGlueUpdatetime(jobInfo.getGlueUpdatetime().getTime());
@@ -185,17 +185,17 @@ public class XxlJobTrigger {
                 .append((routeAddressResult!=null&&routeAddressResult.getMsg()!=null)?routeAddressResult.getMsg()+"<br><br>":"").append(triggerResult.getMsg()!=null?triggerResult.getMsg():"");
 
         // 6、save log trigger-info
-        jobLog.setExecutorAddress(address);
-        jobLog.setExecutorHandler(jobInfo.getExecutorHandler());
-        jobLog.setExecutorParam(jobInfo.getExecutorParam());
-        jobLog.setExecutorShardingParam(shardingParam);
-        jobLog.setExecutorFailRetryCount(finalFailRetryCount);
+//        jobLog.setExecutorAddress(address);
+//        jobLog.setExecutorHandler(jobInfo.getExecutorHandler());
+//        jobLog.setExecutorParam(jobInfo.getExecutorParam());
+//        jobLog.setExecutorShardingParam(shardingParam);
+//        jobLog.setExecutorFailRetryCount(finalFailRetryCount);
         //jobLog.setTriggerTime();
-        jobLog.setTriggerCode(triggerResult.getCode());
-        jobLog.setTriggerMsg(triggerMsgSb.toString());
-        XxlJobAdminConfig.getAdminConfig().getXxlJobLogDao().updateTriggerInfo(jobLog);
+//        jobLog.setTriggerCode(triggerResult.getCode());
+//        jobLog.setTriggerMsg(triggerMsgSb.toString());
+//        XxlJobAdminConfig.getAdminConfig().getXxlJobLogDao().updateTriggerInfo(jobLog);
 
-        logger.debug(">>>>>>>>>>> xxl-job trigger end, jobId:{}", jobLog.getId());
+        logger.debug(">>>>>>>>>>> xxl-job trigger end, no syslog");
     }
 
     /**
